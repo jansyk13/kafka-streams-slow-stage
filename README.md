@@ -1,4 +1,4 @@
-# Example of Spring Boot app with Kafka Streams and parallel-consumer
+# Handling slow stage in Kafka Streams
 
 Example project of combining Spring Boot application with 
 [Kafka Streams](https://kafka.apache.org/documentation/streams/) and
