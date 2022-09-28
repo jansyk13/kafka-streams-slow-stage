@@ -5,12 +5,14 @@ Example project of combining Spring Boot application with
 [parallel-consumer](https://github.com/confluentinc/parallel-consumer).
 
 # Motivation
-Kafka is a great tool, but it is misused in many cases. One of the common pitfalls are slow stages with scale on demand
-requirement. Kafka itself is not very flexible in subscription model and scaling it, you can see this as good or bad.
-As an engineer I want to focus on writing my application using opinionated framework, which simplifies things for me.
-That is why I like Spring Boot and Kafka Streams, they provide with wide ecosystem and many tools. All of this is great
-until you hit the mentioned pitfall with Kafka. This projects aims to showcase how to solve it without introducing
-different tool for messaging/streaming/queueing.
+Kafka is a great tool, but it is misused in many cases. One of the common pitfalls is slow stages with scale-on-demand
+requirement. Kafka itself is not very flexible in a subscription model and scaling it; you can see this as good or bad.
+As an engineer, I want to focus on writing my application using an opinionated framework, simplifying things.
+That is why I like Spring Boot and Kafka Streams; they provide a broad ecosystem and many tools. All of this is great
+until you hit the mentioned pitfall with Kafka. This project aims to showcase how to solve it without introducing
+a different messaging/streaming/queueing tool.
+
+I recommend having a look at [introducing-confluent-labs-parallel-consumer-client](https://www.confluent.io/en-gb/events/kafka-summit-europe-2021/introducing-confluent-labs-parallel-consumer-client/).
 
 # Stream set up
 
