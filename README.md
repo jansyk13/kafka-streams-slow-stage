@@ -25,9 +25,17 @@ builder.stream(
     .to("slow-stage-in") // reroute to stage topic for slow stage
 
 parallelStream.subscribe(listOf("slow-stage-in")) // consume slow stage input topic
-parallelStream.pollAndProduce { pullContext -> 
+parallelStream.react { pc ->
     // any slow logic
-    ProducerRecord("slow-stage-out", pullContext.key(), pullContext.value()) // produce result to slow stage output topic
+    WebClient.create()
+        .get()
+        .uri("http://example.com")
+        .retrieve()
+        .toMono()
+        .flatMap { rs -> rs.bodyToMono<String>() }
+        .flatMap { body ->
+            kafkaProducer.send(ProducerRecord("slow-stage-out", pc.key(), body)).toMono() // produce result to slow stage output topic
+        }
 }
 
 builder.stream(

@@ -1,6 +1,7 @@
 package io.jansyk.stream
 
 import org.apache.kafka.clients.producer.ProducerRecord
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -39,7 +40,7 @@ class KafkaStreamsSlowStageApplicationTests {
         assertTrue(resultIterator.hasNext())
         val record = resultIterator.next()
         assertEquals(record.key(), "a")
-        assertEquals(record.value(), "b")
+        assertTrue(record.value().contains("<h1>Example Domain</h1>"))
     }
 
 }

@@ -3,9 +3,12 @@ package io.jansyk.stream
 import io.confluent.parallelconsumer.ParallelConsumerOptions
 import io.confluent.parallelconsumer.ParallelConsumerOptions.ProcessingOrder.UNORDERED
 import io.confluent.parallelconsumer.ParallelStreamProcessor
+import io.confluent.parallelconsumer.reactor.ReactorProcessor
 import org.apache.kafka.clients.admin.NewTopic
 import org.apache.kafka.clients.consumer.Consumer
+import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.Producer
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.kafka.config.TopicBuilder
@@ -17,12 +20,18 @@ import org.springframework.kafka.core.ProducerFactory
 class KafkaConfig {
 
     @Bean
+    fun kafkaProducer(
+        producerFactory: ProducerFactory<String, String>,
+    ): Producer<String, String> {
+        return producerFactory.createProducer()
+    }
+
+    @Bean
     fun parallelStream(
         consumerFactory: ConsumerFactory<String, String>,
-        producerFactory: ProducerFactory<String, String>
-    ): ParallelStreamProcessor<String, String> {
-        val kafkaConsumer: Consumer<String, String> = consumerFactory.createConsumer("slow-stage-consumer","")
-        val kafkaProducer: Producer<String, String> = producerFactory.createProducer()
+        kafkaProducer: Producer<String, String>,
+    ): ReactorProcessor<String, String> {
+        val kafkaConsumer: Consumer<String, String> = consumerFactory.createConsumer("slow-stage-consumer", "")
 
         val options = ParallelConsumerOptions.builder<String, String>()
             .ordering(UNORDERED)
@@ -31,7 +40,7 @@ class KafkaConfig {
             .producer(kafkaProducer)
             .build()
 
-        return ParallelStreamProcessor.createEosStreamProcessor(options)
+        return ReactorProcessor(options)
     }
 
     @Bean

@@ -17,7 +17,10 @@ repositories {
 
 dependencies {
 	implementation("io.confluent.parallelconsumer:parallel-consumer-core:0.5.2.2")
+	implementation("io.confluent.parallelconsumer:parallel-consumer-reactor:0.5.2.2")
+	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.1.7")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
 	implementation("org.apache.kafka:kafka-streams")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
