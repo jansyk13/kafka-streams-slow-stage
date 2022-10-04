@@ -27,6 +27,7 @@ dependencies {
 	implementation("org.springframework.kafka:spring-kafka")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.kafka:spring-kafka-test")
+	testImplementation("com.github.tomakehurst:wiremock-jre8:2.34.0")
 }
 
 tasks.withType<KotlinCompile> {

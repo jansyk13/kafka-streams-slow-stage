@@ -1,10 +1,13 @@
 package io.jansyk.stream
 
+import com.github.tomakehurst.wiremock.client.WireMock.*
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.apache.kafka.clients.producer.ProducerRecord
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.kafka.core.ConsumerFactory
@@ -14,21 +17,33 @@ import java.time.Duration
 
 
 @SpringBootTest
-@EmbeddedKafka(partitions = 1, brokerProperties = ["listeners=PLAINTEXT://localhost:9092", "port=9092"])
+@EmbeddedKafka(partitions = 1, brokerProperties = ["listeners=PLAINTEXT://localhost:9092", "port=9092", "auto.create.topics.enable=false"])
 class KafkaStreamsSlowStageApplicationTests {
 
     @Autowired
     private lateinit var producerFactory: ProducerFactory<String, String>
 
-
     @Autowired
     private lateinit var consumerFactory: ConsumerFactory<String, String>
+
+    @RegisterExtension
+    var wiremock = WireMockExtension.newInstance()
+        .options(wireMockConfig().port(8089))
+        .build()
 
     @Test
     fun testSimple() {
         // given
         val producer = producerFactory.createProducer()
         val consumer = consumerFactory.createConsumer("test-consumer", "")
+        wiremock.stubFor(
+            get(urlPathMatching("/foo"))
+                .willReturn(
+                    aResponse()
+                        .withStatus(200)
+                        .withBody("foo")
+                )
+        )
 
         // when
         consumer.subscribe(listOf("out"))
@@ -40,7 +55,7 @@ class KafkaStreamsSlowStageApplicationTests {
         assertTrue(resultIterator.hasNext())
         val record = resultIterator.next()
         assertEquals(record.key(), "a")
-        assertTrue(record.value().contains("<h1>Example Domain</h1>"))
+        assertEquals(record.value(), "foo")
     }
 
 }

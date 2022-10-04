@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
+import java.time.Duration
 
 private val logger: Logger = LoggerFactory.getLogger(KafkaStream::class.java)
 
@@ -38,12 +39,22 @@ class KafkaStream {
         parallelStream.react { pc ->
             WebClient.create()
                 .get()
-                .uri("http://example.com")
+                .uri("http://localhost:8089/foo")
                 .retrieve()
                 .toMono()
                 .flatMap { rs -> rs.bodyToMono<String>() }
+                .map { body ->
+                    logger.info("slow {} {} {}", pc.key(), pc.value(), body)
+                    body
+                }
                 .flatMap { body ->
                     kafkaProducer.send(ProducerRecord("slow-stage-out", pc.key(), body)).toMono()
+                }
+                .doOnError{
+                    logger.error("slow error {} {} ", pc.key(), pc.value(), it)
+                }
+                .doOnSuccess {
+                    logger.info("slow success {} {} ", pc.key(), pc.value())
                 }
         }
 
